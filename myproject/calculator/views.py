@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+import hashlib
 
 from calculator.models import User
 
@@ -30,7 +31,7 @@ def add_user(request):
     data = json.loads(request.body)
     username = data.get("username")
     password = data.get("password")
-    
+    password = hashlib.sha256(password.encode("utf-8")).hexdigest()
     users = User.objects.all()
     for existing_user in users:
         if existing_user.username == username:
@@ -46,7 +47,7 @@ def login(request):
     data = json.loads(request.body)
     username = data.get("username")
     password = data.get("password")
-    
+    password = hashlib.sha256(password.encode("utf-8")).hexdigest()
     try:
         user = User.objects.get(username=username,password=password)
         return HttpResponse("user exists!",status=200)
